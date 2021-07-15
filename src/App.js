@@ -1,32 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 
 import NoteList from "./components/NoteList";
 import Search from "./components/Search";
 import Header from "./components/Header";
 const App = () => {
-  const [notes, setNotes] = useState([
-    {
-      text: "This is my first Note",
-      date: "15/20/2021",
-      id: nanoid(),
-    },
-    {
-      text: "This is my second Note",
-      date: "15/20/2021",
-      id: nanoid(),
-    },
-    {
-      text: "This is my third Note",
-      date: "15/20/2021",
-      id: nanoid(),
-    },
-    {
-      text: "This is my first Note",
-      date: "15/20/2021",
-      id: nanoid(),
-    },
-  ]);
+  const [notes, setNotes] = useState([]);
 
   const deleteNote = (id) => {
     console.log("Ge");
@@ -50,18 +29,33 @@ const App = () => {
   };
 
   const [searchText, setSearchText] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
+  let classes = darkMode ? "container dark-mode" : "container";
+
+  useEffect(() => {
+    const savedNotes = JSON.parse(localStorage.getItem("react-notes"));
+    if (savedNotes) {
+      setNotes(savedNotes);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("react-notes", JSON.stringify(notes));
+  }, [notes]);
 
   return (
-    <div className="container">
-      <Header />
-      <Search handleSearchNote={setSearchText} />
-      <NoteList
-        handleAddNote={AddNote}
-        notes={notes.filter((note) => {
-          return note.text.toLocaleLowerCase().includes(searchText);
-        })}
-        handleDeleteNote={deleteNote}
-      />
+    <div className={classes}>
+      <div className="container">
+        <Header handleDarkMode={setDarkMode} />
+        <Search handleSearchNote={setSearchText} />
+        <NoteList
+          handleAddNote={AddNote}
+          notes={notes.filter((note) => {
+            return note.text.toLocaleLowerCase().includes(searchText);
+          })}
+          handleDeleteNote={deleteNote}
+        />
+      </div>
     </div>
   );
 };
